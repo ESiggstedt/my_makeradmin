@@ -18,7 +18,15 @@ class MemberAdd extends React.Component {
                 <h2>Skapa medlem</h2>
                 <MemberForm
                     member={this.member}
-                    onSave={() => this.member.save().then(() => browserHistory.replace('/membership/members/' + this.member.id))}
+                    onSave={() => this.member.save().then(() => browserHistory.replace('/membership/members/' + this.member.id))
+                        // //ADDED THIS    
+                        // .then(function (text) {                          // second then()
+                        //     console.log('Request successful', text);
+                        // })
+                        // .catch(function (error) {                        // catch
+                        //     console.log('Error occured!!', error);
+                        // })
+                    }
                 />
             </div>
         );

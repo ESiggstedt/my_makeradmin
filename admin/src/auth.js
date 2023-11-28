@@ -1,5 +1,5 @@
-import {showError, showSuccess} from "./message";
-import {post} from "./gateway";
+import { showError, showSuccess } from "./message";
+import { post } from "./gateway";
 
 
 class Auth {
@@ -7,7 +7,7 @@ class Auth {
     getAccessToken() {
         return localStorage.token;
     }
-    
+
     setToken(token) {
         localStorage.token = token;
         this.onChange(true);
@@ -16,32 +16,32 @@ class Auth {
     getUsername() {
         return localStorage.username;
     }
-    
+
     setUsername(username) {
         localStorage.username = username;
         this.onChange(true);
     }
-    
+
     isLoggedIn() {
-        return typeof(this.getAccessToken()) !== "undefined";
+        return typeof (this.getAccessToken()) !== "undefined";
     }
 
     // Ask server to send a password reset email to the user.
     requestPasswordReset(user_identification) {
-        return post({url: "/oauth/request_password_reset", params: {user_identification}, errorMessage: "Error when sending", expectedDataStatus: 'ok'});
+        return post({ url: "/oauth/request_password_reset", params: { user_identification }, errorMessage: "Error when sending", expectedDataStatus: 'ok' });
     }
 
     // Reset the password.
     passwordReset(reset_token, unhashed_password) {
-        return post({url: "/oauth/password_reset", params: {unhashed_password, reset_token}, errorMessage: "Error when sending", expectedDataStatus: 'ok'});
+        return post({ url: "/oauth/password_reset", params: { unhashed_password, reset_token }, errorMessage: "Error when sending", expectedDataStatus: 'ok' });
     }
 
     login(username, password) {
         fetch(config.apiBasePath + "/oauth/token",
             {
-                body:    JSON.stringify({grant_type: "password", username, password}),
-                method:  "POST",
-                headers: {'Content-Type': 'application/json; charset=UTF-8'},
+                body: JSON.stringify({ grant_type: "password", username, password }),
+                method: "POST",
+                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
             })
             .then(response => {
                 if (response.status === 401) {
@@ -53,7 +53,7 @@ class Auth {
                 if (response.status === 200) {
                     return response.json();
                 }
-            
+
                 return Promise.reject("Oväntad statuskod (" + response.status + ") från servern.");
             })
             .catch(msg => {
@@ -74,12 +74,12 @@ class Auth {
         if (token) {
             fetch(config.apiBasePath + "/oauth/token/" + token,
                 {
-                    method:  "DELETE",
-                    headers: {'Content-Type': 'application/json; charset=UTF-8', "Authorization": "Bearer " + token},
+                    method: "DELETE",
+                    headers: { 'Content-Type': 'application/json; charset=UTF-8', "Authorization": "Bearer " + token },
                 })
                 .then(() => null, () => null);
         }
-        
+
         // Delete from localStorage and send user to login form.
         delete localStorage.token;
         this.onChange(false);
@@ -88,12 +88,12 @@ class Auth {
     login_via_single_use_link(tag) {
         fetch(config.apiBasePath + "/member/send_access_token",
             {
-                body:    JSON.stringify({user_identification: tag}),
-                method:  "POST",
-                headers: {'Content-Type': 'application/json; charset=UTF-8'},
+                body: JSON.stringify({ user_identification: tag }),
+                method: "POST",
+                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
             })
-            .then(response => response.json().then(responseData => ({response, responseData})))
-            .then(({response, responseData}) => {
+            .then(response => response.json().then(responseData => ({ response, responseData })))
+            .then(({ response, responseData }) => {
                 if (response.status === 200) {
                     showSuccess("Ett mail har skickats till dig med en inloggningslänk, använd den för att logga in.");
                 }
@@ -112,11 +112,37 @@ class Auth {
                 showError("<h2>Inloggningen misslyckades</h2>Kunde inte kommunicera med servern.");
             });
     }
-    
+
+    // ADDED THIS
+    update_member_info(user_id) {
+        console.log('HEJ2!');
+        console.log(user_id);
+        console.log(config.apiBasePath);
+        fetch(config.apiBasePath + "/members/send_updated_member_info",
+            {
+                method: "POST",
+                body: JSON.stringify({ member_id: user_id }),
+                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+            })
+            .then(function (response) {                      // first then()
+                if (response.ok) {
+                    return response.text();
+                }
+
+                throw new Error('Something went wrong.');
+            })
+            .then(function (text) {                          // second then()
+                console.log('Request successful', text);
+            })
+            .catch(function (error) {                        // catch
+                console.log('Error occured!', error);
+            });
+    }
+    // showError("<h2>Misslyckades skicka email</h2> Tog emot följande svar: <br><br>" + response.status + " " + response.statusText);
     onChange() {
     }
-}
 
+}
 
 const auth = new Auth();
 

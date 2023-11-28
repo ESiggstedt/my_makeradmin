@@ -5,12 +5,14 @@ from quiz.views import member_quiz_statistics
 from flask import request, g
 
 from member import service
-from member.member import send_access_token_email, set_pin_code, get_member_groups
+from member.member import send_access_token_email, set_pin_code, get_member_groups, send_updated_member_info_email
 from membership.member_auth import get_member_permissions
 from membership.membership import get_access_summary, get_membership_summary
 from membership.views import member_entity
+from membership.models import Member
 from service.api_definition import POST, PUBLIC, Arg, GET, USER, natural1, non_empty_str
 from change_phone_request import change_phone_request, change_phone_validate
+
 
 
 @service.route("/send_access_token", method=POST, permission=PUBLIC)
@@ -25,6 +27,21 @@ def send_access_token(redirect=Arg(str, required=False), user_identification: st
 def current_member():
     """Get current member."""
     return member_entity.read(g.user_id)
+
+
+# ADDED THIS
+@service.route("/current/send_updated_member_info", method=POST, permission=PUBLIC)
+def current_send_updated_member_info():
+    """Send email to current user with information that personal information has been updated."""
+    print('HEJ3!')
+    # return {"status": "sent"}
+    return send_updated_member_info_email(g.user_id)
+# @service.route("/send_updated_member_info", method=POST, permission=PUBLIC)
+# def current_send_updated_member_info(user_identification: str = Arg(str)):
+#     """Send email to current user with information that personal information has been updated."""
+#     print('HEJ3!')
+#     return {"status": "sent"}
+    #return send_updated_member_info_email(user_identification)
 
 
 @service.route("/current/permissions", method=GET, permission=USER)

@@ -30,7 +30,23 @@ def send_access_token_email(redirect, user_identification, ip, browser):
         url=url,
         now=format_datetime(datetime.now()),
     )
+    
+    return {"status": "sent"}
 
+
+# ADDED THIS
+def send_updated_member_info_email(user_identification):
+    print('HEJ4!')
+    member = get_member_by_user_identification(user_identification)
+
+    logger.info(f"sending email about updated personal information to member_id {member.member_id}")
+
+    send_message(
+        MessageTemplate.UPDATED_MEMBER_INFO,
+        member,
+        now=format_datetime(datetime.now()),
+    )
+    
     return {"status": "sent"}
 
 
