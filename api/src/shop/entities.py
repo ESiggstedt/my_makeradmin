@@ -84,6 +84,7 @@ product_accounting_entity = Entity(
     default_sort_column="id",
     default_sort_order=ASC,
     search_columns=("cost_center_id", "account_id"),
+)
 
 gift_card_entity = Entity(
     GiftCard,
