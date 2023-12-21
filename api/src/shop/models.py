@@ -74,7 +74,7 @@ class Product(Base):
 
     category = relationship(ProductCategory, backref="products")
     actions = relationship("ProductAction")
-    product_accounting = relationship("ProductAccountsCostCenters", backref="accounts_cost_centers")
+    product_accounting = relationship("ProductAccountsCostCenters", backref="products")
 
     image_id = Column(Integer, ForeignKey(ProductImage.id), nullable=True)
 
@@ -269,12 +269,11 @@ class ProductAccountsCostCenters(Base):
     debits = Column(Numeric(10, 2), nullable=False, server_default=("0"))
     credits = Column(Numeric(10, 2), nullable=False, server_default=("0"))
 
-    product = relationship(Product, backref="accounts_cost_centers")
     account = relationship(TransactionAccount, backref="accounts_cost_centers")
     cost_center = relationship(TransactionCostCenter, backref="accounts_cost_centers")
 
     def __repr__(self) -> str:
-        return f"ProductAccounting(id={self.id}, cost_center={self.cost_center}, account={self.account}, debits={self.debits}, credits={self.credits})"
+        return f"ProductAccountsCostCenters(id={self.id}, cost_center={self.cost_center}, account={self.account}, debits={self.debits}, credits={self.credits})"
 
 
 class StripePending(Base):
